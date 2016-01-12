@@ -2,6 +2,10 @@
 
 #include "ofMain.h"
 #include "ofxAruco.h"
+#include "ofxOsc.h"
+
+#define HOST "localhost"
+#define PORT 12345
 
 class ofApp : public ofBaseApp{
 
@@ -40,5 +44,11 @@ class ofApp : public ofBaseApp{
         ofTexture videoTexture;
         int camWidth;
         int camHeight;
+
+        ofxOscSender oscSender;
+
+        ofTrueTypeFont verdana14;
+
+        ofVec3f lastRotation;
 
 };

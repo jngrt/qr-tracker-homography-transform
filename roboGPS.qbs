@@ -21,6 +21,7 @@ Project{
             'ofxAruco',
             'ofxCv',
             'ofxOpenCv',
+            'ofxOsc'
         ]
 
         // additional flags for the project. the of module sets some
