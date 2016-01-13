@@ -7,6 +7,16 @@
 #define HOST "localhost"
 #define PORT 12345
 
+struct Bot {
+    int id;
+    float x;
+    float y;
+    float rotation;
+    string toString(){
+        return ofToString(id) + " - x:" +ofToString(x) + " y:"+ofToString(y) + " r:"+ ofToString(rotation);
+    }
+};
+
 class ofApp : public ofBaseApp{
 
 	public:
@@ -25,6 +35,8 @@ class ofApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
+
+        void removeBotWithId(int id);
 		
         ofVideoGrabber grabber;
         ofVideoPlayer player;
@@ -49,6 +61,6 @@ class ofApp : public ofBaseApp{
 
         ofTrueTypeFont verdana14;
 
-        ofVec3f lastRotation;
+        vector<Bot> bots;
 
 };

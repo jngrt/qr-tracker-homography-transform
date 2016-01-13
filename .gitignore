@@ -1,3 +1,5 @@
 obj
 *.qbs.user
 *.qbs~
+bin/*_debug
+bin/roboGPS_debug
