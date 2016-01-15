@@ -37,6 +37,7 @@ class ofApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
 
         void removeBotWithId(int id);
+        int getBotIndex(int id);
 		
         ofVideoGrabber grabber;
         ofVideoPlayer player;
@@ -48,7 +49,7 @@ class ofApp : public ofBaseApp{
         bool showMarkers;
         bool showBoard;
         bool showBoardImage;
-        ofImage board;
+       // ofImage board;
         ofImage marker;
 
         //ofVideoGrabber vidGrabber;
@@ -62,5 +63,17 @@ class ofApp : public ofBaseApp{
         ofTrueTypeFont verdana14;
 
         vector<Bot> bots;
+
+        void findHomography(ofPoint src[4], ofPoint dst[4], float homography[16]);
+        void gaussian_elimination(float *input, int n);
+
+        ofImage image;
+        ofPoint trapezoid[4];
+        int clickCount;
+        bool homoReady = false;
+        GLfloat homoMatrix[16];
+
+        ofFbo fbo;
+        ofImage curFrame;
 
 };

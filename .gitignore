@@ -3,3 +3,6 @@ obj
 *.qbs~
 bin/*_debug
 bin/roboGPS_debug
+bin/*_debug
+bin/**_debug
+bin/roboGPS_debug
