@@ -4,7 +4,7 @@
 #include "ofxAruco.h"
 #include "ofxOsc.h"
 
-#define HOST "localhost"
+#define HOST "192.168.0.101"
 #define PORT 12345
 
 struct Bot {

@@ -46,8 +46,8 @@ void ofApp::setup(){
     oscSender.setup(HOST, PORT);
     ofSetVerticalSync(true);
 
-    camWidth = 1280;  // try to grab at this size.
-    camHeight = 720;
+    camWidth = 1920;  // try to grab at this size.
+    camHeight = 1080;
 
     //we can now get back a list of devices.
     vector<ofVideoDevice> devices = grabber.listDevices();
@@ -64,12 +64,13 @@ void ofApp::setup(){
     video = &grabber;
 
     //aruco.setThreaded(false);
-    aruco.setup("intrinsics.int", video->getWidth(), video->getHeight(), "");
+    aruco.setup("intrinsics.int", camWidth, camHeight, "");
+
     showMarkers = true;
 
     ofEnableAlphaBlending();
 
-    fbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGB);
+    fbo.allocate(camWidth, camHeight, GL_RGB);
 
 }
 
@@ -79,9 +80,9 @@ void ofApp::update(){
 
         ofPoint destination[] = {
             ofPoint(0,0),
-            ofPoint(ofGetWidth(),0),
-            ofPoint(ofGetWidth(), ofGetHeight()),
-            ofPoint(0,ofGetHeight())};
+            ofPoint(camWidth,0),
+            ofPoint(camWidth, camHeight),
+            ofPoint(0,camHeight)};
 
         findHomography(trapezoid,destination,homoMatrix);
         homoReady = true;
@@ -103,7 +104,7 @@ void ofApp::update(){
                 glPopMatrix();
                 glPopMatrix();
             fbo.end();
-            fbo.readToPixels(curFrame.getPixelsRef());
+            fbo.readToPixels(curFrame.getPixels());
             aruco.detectMarkers(curFrame.getPixels());
 
         }else {
@@ -122,12 +123,20 @@ void ofApp::update(){
             int index = this->getBotIndex(id);
             //removeBotWithId(id);
             if( index == -1 ) {
-              bots.push_back(Bot{id, center.x / ofGetWidth(), center.y / ofGetHeight(), roll});
+              bots.push_back(Bot{id, center.x / video->getWidth(), center.y / video->getHeight(), roll});
             } else {
-                bots[index].x = center.x / ofGetWidth();
-                bots[index].y = center.y / ofGetHeight();
+                bots[index].x = center.x / video->getWidth();
+                bots[index].y = center.y / video->getHeight();
                 bots[index].rotation = roll;
             }
+
+
+        }
+
+
+        // Send OSC message for each bot
+        for(int i = 0; i < bots.size(); i++ ){
+            //ofLogNotice(bots[i].toString());
             ofxOscMessage m;
             m.setAddress("/robogps");
             // robot id
@@ -140,14 +149,7 @@ void ofApp::update(){
             m.addFloatArg(bots[i].rotation);
 
             oscSender.sendMessage(m, false);
-
         }
-
-
-        // Send OSC message for each bot
-        //for(int i = 0; i < bots.size(); i++ ){
-
-        //}
 
     }
 
@@ -158,21 +160,38 @@ void ofApp::draw(){
 
 
     ofSetColor(255);
+
+    //make window and video scalable
+    float ratio = 1;
+    ofPushMatrix();
+    if(ofGetWidth() < video->getWidth() ){
+        ratio = ofGetWidth() / video->getWidth();
+
+
+        //ofLogNotice(ofToString(ratio));
+        //ofTranslate(ofGetWidth()/2, ofGetHeight()/2);
+        ofScale( ratio, ratio, 1);
+    }
+    
+    //draw video background
     if(homoReady){
-        fbo.draw(0,0,ofGetWidth(),ofGetHeight());
+        fbo.draw(0,0,camWidth,camHeight);
     } else {
         video->draw(0,0);
     }
+    
 
+    
     if(showMarkers){
         for(int i=0;i<aruco.getNumMarkers();i++){
             aruco.begin(i);
-            drawMarker(0.05,ofColor::white);
+            drawMarker(0.15,ofColor::white);
             aruco.end();
         }
     }
 
     ofSetHexColor(0xfff000);
+    ofPopMatrix();
 
     verdana14.drawString("Detected markers: " + ofToString(bots.size()), 10, 20);
     for(int i=0;i<bots.size();i++){
