@@ -4,7 +4,7 @@
 #include "ofxAruco.h"
 #include "ofxOsc.h"
 
-#define HOST "192.168.0.50" //Fixed IP of projector
+#define HOST "192.168.0.50"
 #define PORT 12345
 
 struct Bot {
@@ -36,7 +36,6 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 
-        void removeBotWithId(int id);
         int getBotIndex(int id);
 		
         ofVideoGrabber grabber;
@@ -75,5 +74,7 @@ class ofApp : public ofBaseApp{
 
         ofFbo fbo;
         ofImage curFrame;
+
+        uint64_t lastOscMessage;
 
 };
