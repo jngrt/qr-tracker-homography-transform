@@ -11,14 +11,6 @@ int ofApp::getBotIndex(int id) {
     }
     return -1;
 }
-void ofApp::removeBotWithId(int id) {
-    for( int i=0; i<bots.size();i++) {
-        if( Bot(bots[i]).id == id ) {
-            bots.erase(bots.begin() + i);
-            return;
-        }
-    }
-}
 
 void drawMarker(float size, const ofColor & color){
     ofDrawAxis(size);
@@ -38,6 +30,9 @@ void drawMarker(float size, const ofColor & color){
 //--------------------------------------------------------------
 
 void ofApp::setup(){
+
+    ofSetFrameRate(10);
+    ofLogNotice("fps:"+ofToString(ofGetFrameRate()));
     ofTrueTypeFont::setGlobalDpi(72);
     verdana14.load("verdana.ttf", 14, true, true);
     verdana14.setLineHeight(18.0f);
@@ -59,7 +54,7 @@ void ofApp::setup(){
         }
     }
     grabber.setDeviceID(0);
-    grabber.setDesiredFrameRate(60);
+    grabber.setDesiredFrameRate(10);
     grabber.initGrabber(camWidth, camHeight);
     video = &grabber;
 
@@ -72,10 +67,12 @@ void ofApp::setup(){
 
     fbo.allocate(camWidth, camHeight, GL_RGB);
 
+    lastOscMessage = ofGetElapsedTimeMillis();
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
+    //ofLogNotice(ofToString(ofGetElapsedTimeMillis()));
     if(clickCount==4){
 
         ofPoint destination[] = {
@@ -121,7 +118,7 @@ void ofApp::update(){
 
             int id = aruco::Marker(markers[i]).idMarker;
             int index = this->getBotIndex(id);
-            //removeBotWithId(id);
+
             if( index == -1 ) {
               bots.push_back(Bot{id, center.x / video->getWidth(), center.y / video->getHeight(), roll});
             } else {
@@ -135,20 +132,25 @@ void ofApp::update(){
 
 
         // Send OSC message for each bot
-        for(int i = 0; i < bots.size(); i++ ){
-            //ofLogNotice(bots[i].toString());
-            ofxOscMessage m;
-            m.setAddress("/robogps");
-            // robot id
-            m.addIntArg(bots[i].id);
-            // x
-            m.addFloatArg(bots[i].x);
-            // y
-            m.addFloatArg(bots[i].y);
-            // rotation
-            m.addFloatArg(bots[i].rotation);
+        if( ofGetElapsedTimeMillis() - 100 > lastOscMessage ) {
+            lastOscMessage = ofGetElapsedTimeMillis();
+            //ofLogNotice("OSCMessage?");
+            for(int i = 0; i < bots.size(); i++ ){
+                //ofLogNotice(bots[i].toString());
+                ofxOscMessage m;
+                m.setAddress("/robogps");
+                // robot id
+                m.addIntArg(bots[i].id);
+                // x
+                m.addFloatArg(bots[i].x);
+                // y
+                m.addFloatArg(bots[i].y);
+                // rotation
+                m.addFloatArg(bots[i].rotation);
 
-            oscSender.sendMessage(m, false);
+                oscSender.sendMessage(m, false);
+                ofLogNotice("send OSC - " + ofToString(lastOscMessage));
+            }
         }
 
     }
