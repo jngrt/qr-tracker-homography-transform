@@ -4,7 +4,7 @@
 #include "ofxAruco.h"
 #include "ofxOsc.h"
 
-#define HOST "192.168.0.101"
+#define HOST "192.168.0.50" //Fixed IP of projector
 #define PORT 12345
 
 struct Bot {
