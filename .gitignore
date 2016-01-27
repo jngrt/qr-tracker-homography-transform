@@ -8,3 +8,4 @@ bin/**_debug
 bin/roboGPS_debug
 bin/roboGPS
 bin/*App
+bin/roboGPS*
